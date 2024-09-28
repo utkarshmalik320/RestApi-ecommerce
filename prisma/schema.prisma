@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// Define the database connection
+datasource db {
+  provider = "postgresql" // or "mysql" depending on your DB
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Account {
+  id          Int      @id @default(autoincrement()) // Unique ID for the user
+  firstName   String   @map("first_name") // First name of the user
+  lastName    String   @map("last_name") // Last name of the user
+  email       String   @unique // User email, must be unique
+  phoneNumber String?  @map("phone_number") // Optional phone number
+  password    String // Hashed password for authentication
+  createdAt   DateTime @default(now()) // Account creation timestamp
+  updatedAt   DateTime @updatedAt // Timestamp for last update
+  orders      Order[] // One-to-many relationship with orders
+
+  @@map("accounts") // Optional: This allows you to customize the table name in the database
+}
+
+model Order {
+  id          Int      @id @default(autoincrement()) // Unique order ID
+  orderNumber String   @unique // Unique order number
+  totalAmount Float // Total amount of the order
+  status      String // Status of the order (e.g., 'pending', 'shipped', 'delivered')
+  createdAt   DateTime @default(now()) // Order creation timestamp
+  userId      Int // Foreign key to the Account (user)
+  account     Account  @relation(fields: [userId], references: [id]) // Relation to Account model
+  products    String[] // Array to store list of product names/IDs in the order
+
+  @@map("orders") // Optional: Customize table name
+}
