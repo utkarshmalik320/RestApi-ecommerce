@@ -45,7 +45,7 @@
 #
 ################################################
 
-config/local.js
+#config/local.js
 
 
 ################################################
@@ -87,7 +87,7 @@ config/local.js
 #
 ################################################
 
-node_modules
+node_modules/
 
 
 ################################################
@@ -105,7 +105,7 @@ node_modules
 ################################################
 
 .tmp
-
+.env
 
 ################################################
 # Miscellaneous
@@ -120,8 +120,6 @@ node_modules
 .netbeans
 nbproject
 .idea
-*.iml
-.vscode
 .node_history
 dump.rdb
 
@@ -129,9 +127,7 @@ npm-debug.log
 lib-cov
 *.seed
 *.log
-.env
 *.out
-
-
-
-
+*.pid
+devnote
+.nyc_output/
