@@ -32,6 +32,7 @@ const jwt = require('jsonwebtoken');
 const prisma = new PrismaClient();
 
 
+
 console.log('DATABASE_URL:', process.env.DATABASE_URL); // Add this line
 // Attempt to import `sails` dependency, as well as `rc` (for loading `.sailsrc` files).
 var sails;

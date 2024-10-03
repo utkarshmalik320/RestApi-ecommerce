@@ -15,28 +15,50 @@ generator client {
 }
 
 model Account {
-  id          Int      @id @default(autoincrement()) // Unique ID for the user
-  firstName   String   @map("first_name") // First name of the user
-  lastName    String   @map("last_name") // Last name of the user
-  email       String   @unique // User email, must be unique
-  phoneNumber String?  @map("phone_number") // Optional phone number
-  password    String // Hashed password for authentication
-  createdAt   DateTime @default(now()) // Account creation timestamp
-  updatedAt   DateTime @updatedAt // Timestamp for last update
-  orders      Order[] // One-to-many relationship with orders
+  id          Int       @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  email       String    @unique
+  phoneNumber String
+  password    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  deletedAt   DateTime?
 
-  @@map("accounts") // Optional: This allows you to customize the table name in the database
+  @@map("account") // Optional: Customize table name
 }
 
 model Order {
-  id          Int      @id @default(autoincrement()) // Unique order ID
-  orderNumber String   @unique // Unique order number
-  totalAmount Float // Total amount of the order
-  status      String // Status of the order (e.g., 'pending', 'shipped', 'delivered')
-  createdAt   DateTime @default(now()) // Order creation timestamp
-  userId      Int // Foreign key to the Account (user)
-  account     Account  @relation(fields: [userId], references: [id]) // Relation to Account model
-  products    String[] // Array to store list of product names/IDs in the order
+  id             Int      @id @default(autoincrement())
+  orderNumber    String   @unique @default(uuid())
+  totalAmount    Float
+  status         String // Status of the order (e.g., 'pending', 'shipped', 'delivered')
+  createdAt      DateTime @default(now())
+  accountId      Int? // Foreign key to the Account (user)
+  productDetails Json     @default("{}")
 
   @@map("orders") // Optional: Customize table name
+}
+
+model Product {
+  id          Int      @id @default(autoincrement()) // Unique product ID
+  name        String // Name of the product
+  description String? // Optional description of the product
+  price       Float // Price of the product
+  createdAt   DateTime @default(now()) // Timestamp when the product was created
+  updatedAt   DateTime @updatedAt // Timestamp when the product was last updated
+
+  @@map("products") // Optional: Customize table name
+}
+
+model Seller {
+  id          Int       @id @default(autoincrement()) // Unique ID for each seller
+  name        String // Seller's name
+  phoneNumber String // Seller's phone number
+  email       String    @unique // Seller's email address, must be unique
+  password    String // Seller's password (consider hashing this in your application)
+  companyName String // Seller's company name
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  deletedAt   DateTime?
 }

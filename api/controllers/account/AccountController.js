@@ -99,7 +99,10 @@ module.exports = {
    */
   editAccount: async (req, res) => {
     try {
-      const accountId = req.params.id; // Assuming the account ID is passed as a URL parameter
+      sails.log.info("====================== EDIT : ACCOUNT REQUEST ==============================");
+      sails.log.info("REQ BODY :", req.body);
+
+      const id = parseInt(req.query.id); // Assuming the account ID is passed as a URL parameter
       const request = {
         email: req.body.email,
         firstName: req.body.firstName,
@@ -127,22 +130,24 @@ module.exports = {
         where: { email: request.email },
       });
 
-      if (existingAccount && existingAccount.id !== accountId) {
+      if (existingAccount) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "An account with this email already exists.",
+          message: "An account with this email already doesnt exists.",
         });
       }
 
       // Update the account
+      // Update the account
       const updatedAccount = await prisma.account.update({
-        where: { id: accountId },
+        where: { id: id }, // Make sure `request.id` exists and is correct
         data: {
-          email: request.email,
-          firstName: request.firstName,
+          email: request.email, // Ensure `request.email` is not null if updating
+          firstName: request.firstName, // Same for other fields_
           lastName: request.lastName,
           phoneNumber: request.phoneNumber,
         },
       });
+
 
       sails.log.info("Account updated successfully:", updatedAccount);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
@@ -167,11 +172,26 @@ module.exports = {
    */
   deleteAccount: async (req, res) => {
     try {
-      const accountId = req.params.id; // Assuming the account ID is passed as a URL parameter
+      sails.log.info("====================== DELETE : ACCOUNT REQUEST ==============================");
+      sails.log.info("REQ BODY :", req.query);
+      const accountId = parseInt(req.query.id); // Assuming the account ID is passed as a URL parameter
 
-      // Delete the account
-      const deletedAccount = await prisma.account.delete({
+      const account = await prisma.account.findUnique({
         where: { id: accountId },
+      });
+
+      if (!account || account.deletedAt !== null) {
+        sails.log.warn("Account not found or already deleted:", accountId);
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: "Account not found or already deleted.",
+        });
+      }
+      // Delete the account
+      const deletedAccount = await prisma.account.update({
+        where: { id: accountId },
+        data: {
+          deletedAt: new Date().toISOString(),
+        }
       });
 
       sails.log.info("Account deleted successfully:", deletedAccount);
