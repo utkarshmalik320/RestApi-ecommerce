@@ -193,5 +193,56 @@ module.exports = {
     }
   },
 
+  /**
+   * Fetch user details.
+   * API Endpoint :   /account/seller/details
+   * API Method   :   GET
+   *
+   * @param   {Object}        req          Request Object From API Request.
+   * @param   {Object}        res          Response Object For API Request.
+   * @returns {Promise<*>}    JSONResponse With user details or relevant error code with message.
+   */
+  fetchSellerDetails: async (req, res) => {
+    try {
+      sails.log.info("====================== FETCH : SELLER ACCOUNT DETAILS REQUEST ==============================");
+      sails.log.info("REQ QUERY :", req.query);
+
+      const sellerId = parseInt(req.query.id);
+      sails.log.debug("sellerId" , sellerId)
+
+      // Fetch the user details
+      const sellerAccountDetails = await prisma.seller.findUnique({
+        where: { id: sellerId},
+      });
+
+      if (!sellerAccountDetails) {
+        sails.log.warn("Seller not found:", sellerId);
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: "Seller  not found.",
+        });
+      }
+
+      // Check if the user has been soft-deleted (i.e., deletedAt is not null)
+      if (sellerAccountDetails.deletedAt !== null) {
+        sails.log.warn("Seller account has been deleted:", sellerId);
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: "Seller Account has been deleted.",
+        });
+      }
+
+      // Return user details if found and not deleted
+      sails.log.info("Seller Account details fetched successfully:", sellerAccountDetails);
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
+        message: "Seller Account details fetched successfully.",
+        data: sellerAccountDetails,
+      });
+    } catch (exception) {
+      sails.log.error(exception);
+      return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
+        message: "An error occurred while fetching seller details.",
+      });
+    }
+  }
+
 
 }

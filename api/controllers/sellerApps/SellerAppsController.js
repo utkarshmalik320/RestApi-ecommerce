@@ -20,6 +20,7 @@ module.exports = {
       try {
         sails.log.info("====================== LOGIN : SELLER ACCOUNT REQUEST ==============================");
         sails.log.info("REQ BODY :", req.body);
+
         const request = {
           email: req.body.email,
           password: req.body.password,
@@ -120,12 +121,12 @@ module.exports = {
 
       const request = {
         email: req.body.email,
-        password: req.body.password,
+        newPassword: req.body.newPassword,
       }
 
       const schema = Joi.object().keys({
         email: Joi.string().email().required(),
-        password: Joi.string().min(6).required(),
+        newPassword: Joi.string().min(6).required(),
       });
 
       const validateResult = schema.validate(request);
@@ -147,7 +148,7 @@ module.exports = {
       }
 
       // Hash the new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const hashedPassword = await bcrypt.hash(request.newPassword, 10);
 
       // Update the seller's password
       await prisma.seller.update({

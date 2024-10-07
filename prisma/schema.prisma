@@ -41,12 +41,17 @@ model Order {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement()) // Unique product ID
+  id          Int       @id @default(autoincrement()) // Unique product ID
   name        String // Name of the product
   description String? // Optional description of the product
   price       Float // Price of the product
-  createdAt   DateTime @default(now()) // Timestamp when the product was created
-  updatedAt   DateTime @updatedAt // Timestamp when the product was last updated
+  brandName   String    @default("Indian Garage") // Default brand name
+  category    String    @default("Fashion") // Default product category
+  stock       Int       @default(0) // Number of items in stock
+  isAvailable Boolean   @default(true) // Availability status
+  createdAt   DateTime  @default(now()) // Timestamp when the product was created
+  updatedAt   DateTime  @updatedAt // Timestamp when the product was last updated
+  deletedAt   DateTime?
 
   @@map("products") // Optional: Customize table name
 }
@@ -61,4 +66,6 @@ model Seller {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
   deletedAt   DateTime?
+
+  @@map("seller") // Optional: Customize table name
 }
