@@ -29,13 +29,15 @@ model Account {
 }
 
 model Order {
-  id             Int      @id @default(autoincrement())
-  orderNumber    String   @unique @default(uuid())
+  id             Int       @id @default(autoincrement())
+  orderNumber    String    @unique @default(uuid())
   totalAmount    Float
   status         String // Status of the order (e.g., 'pending', 'shipped', 'delivered')
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+  deletedAt      DateTime?
   accountId      Int? // Foreign key to the Account (user)
-  productDetails Json     @default("{}")
+  productDetails Json      @default("{}")
 
   @@map("orders") // Optional: Customize table name
 }

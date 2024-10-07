@@ -16,10 +16,17 @@ module.exports.routes = {
   'POST /product/add': { controller: 'products/ProductController', action: 'addProduct'},
   'POST /product/edit': { controller: 'products/ProductController', action: 'editProduct'},
   'DELETE /product/delete': { controller: 'products/ProductController', action: 'deleteProduct'},
+  'GET /product/all': { controller: 'products/ProductController', action: 'getAllProducts'},
   'GET /product/details': { controller: 'products/ProductController', action: 'getProductDetails'},
+  'POST /product/category': { controller: 'products/ProductController', action: 'fetchProductsByCategory'},
+  'GET /product/category/all': { controller: 'products/ProductController', action: 'fetchUniqueCategories'},
 
   // =================Order Controller=====================================
   'POST /order/create': { controller: 'orders/OrderController', action: 'createOrder'},
+  'GET /orders/details': { controller: 'orders/OrderController', action: 'getAllOrders'},
+  'POST /orders/by/account': { controller: 'orders/OrderController', action: 'getSingleOrder'},
+  'POST /orders/status/update': { controller: 'orders/OrderController', action: 'updateOrderStatus'},
+
 
   // =================Seller Account Controller=====================================
   'POST /seller/account/add': { controller: 'sellerAccount/SellerAccountController', action: 'addSeller'},
