@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const prisma = require("../../../prisma/client");
+const prisma = require('../../../prisma/client');
 
 module.exports = {
 
@@ -14,8 +14,8 @@ module.exports = {
    */
   addToCart: async (req, res) => {
     try {
-      sails.log.info("====================== ADD TO CART ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== ADD TO CART ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extract product info from Request
       const request = {
@@ -58,37 +58,37 @@ module.exports = {
 
       if (!product) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Product not found.",
+          message: 'Product not found.',
         });
       }
 
       // Calculate total amount based on quantity and product price
       const totalAmount = request.price * request.quantity;
 
-        // Add product to cart if it does not already exist
-        const newCartItem = await prisma.cart.create({
-          data: {
-            accountId: request.accountId,
-            productId: request.productId,
-            productName: request.productName,
-            variant: request.variant,
-            brandId: request.brandId,
-            brandName: request.brandName,
-            quantity: request.quantity,
-            price: request.price,
-            totalAmount: totalAmount,
-          },
-        });
+      // Add product to cart if it does not already exist
+      const newCartItem = await prisma.cart.create({
+        data: {
+          accountId: request.accountId,
+          productId: request.productId,
+          productName: request.productName,
+          variant: request.variant,
+          brandId: request.brandId,
+          brandName: request.brandName,
+          quantity: request.quantity,
+          price: request.price,
+          totalAmount: totalAmount,
+        },
+      });
 
-        sails.log.info("Product added to cart successfully:", newCartItem);
-        return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-          message: "Product added to cart successfully.",
-          data: newCartItem,
-        });
+      sails.log.info('Product added to cart successfully:', newCartItem);
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
+        message: 'Product added to cart successfully.',
+        data: newCartItem,
+      });
     } catch (exception) {
-      sails.log.error("Error adding product to cart:", exception);
+      sails.log.error('Error adding product to cart:', exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while adding product to cart.",
+        message: 'An error occurred while adding product to cart.',
       });
     }
   },
@@ -104,8 +104,8 @@ module.exports = {
    */
   removeFromCart: async (req, res) => {
     try {
-      sails.log.info("====================== REMOVE FROM CART ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== REMOVE FROM CART ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extract cart item ID and product ID from the request
       const request = {
@@ -138,7 +138,7 @@ module.exports = {
 
       if (!cartItem) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Cart item not found.",
+          message: 'Cart item not found.',
         });
       }
 
@@ -159,17 +159,17 @@ module.exports = {
         },
       });
 
-      sails.log.info("Product removed from cart successfully:", updatedCartItem);
+      sails.log.info('Product removed from cart successfully:', updatedCartItem);
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Product removed from cart successfully.",
+        message: 'Product removed from cart successfully.',
         data: updatedCartItem, // Return updated cart item details
       });
     } catch (exception) {
-      sails.log.error("Error removing product from cart:", exception);
+      sails.log.error('Error removing product from cart:', exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while removing product from cart.",
+        message: 'An error occurred while removing product from cart.',
       });
     }
   },
@@ -185,20 +185,21 @@ module.exports = {
    */
   fetchCartDetails: async (req, res) => {
     try {
-      sails.log.info("====================== FETCH CART DETAILS ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== FETCH CART DETAILS ==============================');
+      sails.log.info('REQ BODY :', req.query);
 
       // Extract account ID from the request
       const request = {
-        cartId: req.body.cartId,
-        accountId: req.body.productId,
-      }
+        cartId: req.query.cartId,  // Changed to req.query
+        accountId: parseInt(req.query.accountId),  // Changed to req.query
+      };
 
 
       const schema = Joi.object().keys({
         accountId: Joi.number().required(),
         cartId: Joi.string().required(),
       });
+
 
       // Validate Request from Valid Schema
       const validateResult = schema.validate(request);
@@ -219,21 +220,21 @@ module.exports = {
 
       if (!cartItems.length) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "No items found in the cart.",
+          message: 'No items found in the cart',
         });
       }
 
-      sails.log.info("Cart details fetched successfully:", cartItems);
+      sails.log.info('Cart details fetched successfully:', cartItems);
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Cart details fetched successfully.",
+        message: 'Cart details fetched successfully.',
         data: cartItems,
       });
     } catch (exception) {
-      sails.log.error("Error fetching cart details:", exception);
+      sails.log.error('Error fetching cart details:', exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while fetching cart details.",
+        message: 'An error occurred while fetching cart details.',
       });
     }
   },
