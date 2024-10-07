@@ -42,6 +42,25 @@ model Order {
   @@map("orders") // Optional: Customize table name
 }
 
+model Cart {
+  id          String    @id @default(cuid()) // Unique identifier for each cart item
+  accountId   Int // Reference to the user who owns the cart
+  productId   Int // Reference to the product added to the cart
+  productName String    @default("") // Name of the product added to the cart
+  variant     String? // Variant of the product, optional
+  quantity    Int // Number of units of the product in the cart
+  price       Float     @default(0) // Price of the product, default is 0
+  totalAmount Float // Total price for the quantity of products (price * quantity)
+  brandId     Int? // Reference to the brand, optional
+  brandName   String? // Name of the brand, optional
+  isActive    Boolean   @default(true) // Flag to indicate if the item is still active (i.e., unpaid)
+  createdAt   DateTime  @default(now()) // Timestamp for when the item was added to the cart
+  updatedAt   DateTime  @updatedAt // Timestamp for when the item was last updated
+  deletedAt   DateTime? // Timestamp for soft deletion (optional)
+
+  @@map("cart") // Optional: Customize table name
+}
+
 model Product {
   id          Int       @id @default(autoincrement()) // Unique product ID
   name        String // Name of the product

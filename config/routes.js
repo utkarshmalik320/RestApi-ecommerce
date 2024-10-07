@@ -39,7 +39,10 @@ module.exports.routes = {
   'POST /seller/account/login': { controller: 'sellerApps/SellerAppsController', action: 'login'},
   'POST /seller/account/logout': { controller: 'sellerApps/SellerAppsController', action: 'logout'},
   'POST /seller/account/reset-password': { controller: 'sellerApps/SellerAppsController', action: 'resetPassword'},
-  // =================Services Account Controller=====================================
 
+  // =================Add To Cart Controller=====================================
+  'POST /add/to/cart/': { controller: 'cart/CartController', action: 'addToCart'},
+  'POST /remove/from/cart': { controller: 'cart/CartController', action: 'removeFromCart'},
+  'GET /fetch/cart/details': { controller: 'cart/CartController', action: 'fetchCartDetails'},
 
 };
