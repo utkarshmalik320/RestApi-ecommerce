@@ -14,7 +14,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Account {
+model user {
   id          Int       @id @default(autoincrement())
   firstName   String
   lastName    String
@@ -25,7 +25,7 @@ model Account {
   updatedAt   DateTime  @default(now())
   deletedAt   DateTime?
 
-  @@map("account") // Optional: Customize table name
+  @@map("user") // Optional: Customize table name
 }
 
 model Order {
@@ -36,7 +36,7 @@ model Order {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @default(now())
   deletedAt      DateTime?
-  accountId      Int? // Foreign key to the Account (user)
+  userId         Int? // Foreign key to the user (user)
   productDetails Json      @default("{}")
 
   @@map("orders") // Optional: Customize table name
@@ -44,7 +44,7 @@ model Order {
 
 model Cart {
   id          String    @id @default(cuid()) // Unique identifier for each cart item
-  accountId   Int // Reference to the user who owns the cart
+  userId      Int // Reference to the user who owns the cart
   productId   Int // Reference to the product added to the cart
   productName String    @default("") // Name of the product added to the cart
   variant     String? // Variant of the product, optional

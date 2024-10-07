@@ -8,20 +8,20 @@ const bcrypt = require('bcrypt');
 module.exports = {
 
   /**
-   * Add a new account.
-   * API Endpoint :   /account/add
+   * Add a new user.
+   * API Endpoint :   /user/add
    * API Method   :   POST
    *
    * @param   {Object}        req          Request Object From API Request.
    * @param   {Object}        res          Response Object For API Request.
    * @returns {Promise<*>}    JSONResponse With success code 200 and  information or relevant error code with message.
    */
-  addAccount: async (req, res) => {
+  adduser: async (req, res) => {
     try {
-      sails.log.info("====================== ADD : ACCOUNT REQUEST ==============================");
+      sails.log.info("====================== ADD : user REQUEST ==============================");
       sails.log.info("REQ BODY :", req.body);
 
-      // Extracting Account info from Request
+      // Extracting user info from Request
       const request = {
         email: req.body.email,
         firstName: req.body.firstName,
@@ -47,14 +47,14 @@ module.exports = {
         });
       }
 
-      // Check for existing account by email
-      const existingAccount = await prisma.account.findUnique({
+      // Check for existing user by email
+      const existinguser = await prisma.user.findUnique({
         where: { email: request.email },
       });
 
-      if (existingAccount) {
+      if (existinguser) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "An account with this email already exists.",
+          message: "An user with this email already exists.",
         });
       }
 
@@ -62,8 +62,8 @@ module.exports = {
       const hashedPassword = await bcrypt.hash(request.password, 10);
 
       // Create the new address entry first
-      // Now create the new account, linking it to the address
-      const newAccount = await prisma.account.create({
+      // Now create the new user, linking it to the address
+      const newuser = await prisma.user.create({
         data: {
           firstName: request.firstName,
           lastName: request.lastName,
@@ -73,8 +73,8 @@ module.exports = {
         },
       });
 
-      // Log the successful account creation
-      sails.log.info("Account created successfully:", newAccount);
+      // Log the successful user creation
+      sails.log.info("user created successfully:", newuser);
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {

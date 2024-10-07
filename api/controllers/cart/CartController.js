@@ -19,7 +19,7 @@ module.exports = {
 
       // Extract product info from Request
       const request = {
-        accountId: req.body.accountId,
+        userId: req.body.userId,
         productId: req.body.productId,
         productName: req.body.productName,
         variant: req.body.variant || null,
@@ -31,7 +31,7 @@ module.exports = {
 
       // Creating Valid Schema for Request
       const schema = Joi.object().keys({
-        accountId: Joi.number().required(),
+        userId: Joi.number().required(),
         productId: Joi.number().required(),
         productName: Joi.string().required(),
         variant: Joi.string().optional().allow(null),
@@ -68,7 +68,7 @@ module.exports = {
       // Add product to cart if it does not already exist
       const newCartItem = await prisma.cart.create({
         data: {
-          accountId: request.accountId,
+          userId: request.userId,
           productId: request.productId,
           productName: request.productName,
           variant: request.variant,
@@ -188,15 +188,15 @@ module.exports = {
       sails.log.info('====================== FETCH CART DETAILS ==============================');
       sails.log.info('REQ BODY :', req.query);
 
-      // Extract account ID from the request
+      // Extract user ID from the request
       const request = {
         cartId: req.query.cartId,  // Changed to req.query
-        accountId: parseInt(req.query.accountId),  // Changed to req.query
+        userId: parseInt(req.query.userId),  // Changed to req.query
       };
 
 
       const schema = Joi.object().keys({
-        accountId: Joi.number().required(),
+        userId: Joi.number().required(),
         cartId: Joi.string().required(),
       });
 
@@ -209,10 +209,10 @@ module.exports = {
         });
       }
 
-      // Fetch cart items for the given account ID, including product details
+      // Fetch cart items for the given user ID, including product details
       const cartItems = await prisma.cart.findMany({
         where: {
-          accountId: request.accountId,
+          userId: request.userId,
           id: request.cartId,
           deletedAt: null,
         },

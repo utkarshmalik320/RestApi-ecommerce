@@ -9,8 +9,8 @@ const prisma = require("../../../prisma/client");
 module.exports = {
 
   /**
-   * Add a new account.
-   * API Endpoint :   /account/reset-password
+   * Add a new user.
+   * API Endpoint :   /user/reset-password
    * API Method   :   POST
    *
    * @param   {Object}        req          Request Object From API Request.
@@ -19,7 +19,7 @@ module.exports = {
    */
   resetPassword: async (req, res) => {
     try {
-      sails.log.info("====================== RESET-PASSWORD : ACCOUNT REQUEST ==============================");
+      sails.log.info("====================== RESET-PASSWORD : user REQUEST ==============================");
       sails.log.info("REQ BODY :", req.body);
       const { email, newPassword } = req.body;
 
@@ -36,14 +36,14 @@ module.exports = {
         });
       }
 
-      // Find the account
-      const existingAccount = await prisma.account.findUnique({
+      // Find the user
+      const existinguser = await prisma.user.findUnique({
         where: { email },
       });
 
-      if (!existingAccount) {
+      if (!existinguser) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "No account found with this email.",
+          message: "No user found with this email.",
         });
       }
 
@@ -51,7 +51,7 @@ module.exports = {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
       // Update the password
-      await prisma.account.update({
+      await prisma.user.update({
         where: { email },
         data: { password: hashedPassword },
       });
@@ -69,16 +69,16 @@ module.exports = {
   },
 
   /**
-   * Login account.
-   * API Endpoint :   /account/login
+   * Login user.
+   * API Endpoint :   /user/login
    * API Method   :   POST
    *
    * @param   {Object}        req          Request Object From API Request.
    * @param   {Object}        res          Response Object For API Request.
    * @returns {Promise<*>}    JSONResponse With success code 200 and  information or relevant error code with message.
    */
-  loginAccount : async (req, res) => {
-    sails.log.info("====================== LOGIN : ACCOUNT REQUEST ==============================");
+  loginuser : async (req, res) => {
+    sails.log.info("====================== LOGIN : user REQUEST ==============================");
     sails.log.info("REQ BODY :", req.body);
     try {
       const request = {
@@ -97,20 +97,20 @@ module.exports = {
           message: validateResult.error.message,
         });
       }
-      // Find the account by email
-      const account = await prisma.account.findUnique({
+      // Find the user by email
+      const user = await prisma.user.findUnique({
         where: { email: request.email },
       })
 
-      // If the account is not found or is deleted
-      if (_.isEmpty(account)) {
+      // If the user is not found or is deleted
+      if (_.isEmpty(user)) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Account not found.",
+          message: "user not found.",
         });
       }
 
       // Check if the password is correct
-      const isPasswordValid = await bcrypt.compare(request.password, account.password); // Assuming you have stored the hashed password
+      const isPasswordValid = await bcrypt.compare(request.password, user.password); // Assuming you have stored the hashed password
 
       if (!isPasswordValid) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.UNAUTHORIZED, {
@@ -119,7 +119,7 @@ module.exports = {
       }
 
       // Generate a JWT token
-      const token = jwt.sign({ id: account.id, email: request.email }, 'your_jwt_secret', {
+      const token = jwt.sign({ id: user.id, email: request.email }, 'your_jwt_secret', {
         expiresIn: '1h', // Token expiration time
       });
 
@@ -137,7 +137,7 @@ module.exports = {
   },
 
   /**
-   * Logout account.
+   * Logout user.
    * API Endpoint :   /account/logout
    * API Method   :   POST
    *

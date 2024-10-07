@@ -1,16 +1,16 @@
 // config/routes.js
 module.exports.routes = {
-  // =================Account Controller=====================================
+  // =================user Controller=====================================
 
-  'POST /account/add': { controller: 'account/AccountController', action: 'addAccount'},
-  'POST /account/edit': { controller: 'account/AccountController', action: 'editAccount'},
-  'DELETE /account/delete': { controller: 'account/AccountController', action: 'deleteAccount'},
-  'GET /account/details': { controller: 'account/AccountController', action: 'fetchUserDetails'},
+  'POST /user/add': { controller: 'user/userController', action: 'adduser'},
+  'POST /user/edit': { controller: 'user/userController', action: 'edituser'},
+  'DELETE /user/delete': { controller: 'user/userController', action: 'deleteuser'},
+  'GET /user/details': { controller: 'user/userController', action: 'fetchUserDetails'},
 
   // =================Apps Controller=====================================
-  'POST /account/reset-password': { controller: 'apps/AppsController', action: 'resetPassword'},
-  'POST /account/login': { controller: 'apps/AppsController', action: 'loginAccount'},
-  'POST /account/logout': { controller: 'apps/AppsController', action: 'logoutAccount'},
+  'POST /user/reset-password': { controller: 'apps/AppsController', action: 'resetPassword'},
+  'POST /user/login': { controller: 'apps/AppsController', action: 'loginuser'},
+  'POST /user/logout': { controller: 'apps/AppsController', action: 'logoutuser'},
 
   // =================Product Controller=====================================
   'POST /product/add': { controller: 'products/ProductController', action: 'addProduct'},
@@ -24,11 +24,11 @@ module.exports.routes = {
   // =================Order Controller=====================================
   'POST /order/create': { controller: 'orders/OrderController', action: 'createOrder'},
   'GET /orders/details': { controller: 'orders/OrderController', action: 'getAllOrders'},
-  'POST /orders/by/account': { controller: 'orders/OrderController', action: 'getSingleOrder'},
+  'POST /orders/by/user': { controller: 'orders/OrderController', action: 'getSingleOrder'},
   'POST /orders/status/update': { controller: 'orders/OrderController', action: 'updateOrderStatus'},
 
 
-  // =================Seller Account Controller=====================================
+  // =================Seller user Controller=====================================
   'POST /seller/account/add': { controller: 'sellerAccount/SellerAccountController', action: 'addSeller'},
   'POST /seller/account/edit': { controller: 'sellerAccount/SellerAccountController', action: 'editSeller'},
   'DELETE /seller/account/delete': { controller: 'sellerAccount/SellerAccountController', action: 'deleteSeller'},

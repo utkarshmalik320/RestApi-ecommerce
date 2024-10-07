@@ -25,7 +25,7 @@ module.exports = {
       const request = {
         orderNumber: req.body.orderNumber,
         totalAmount: req.body.totalAmount,
-        accountId: req.body.accountId,
+        userId: req.body.userId,
         productDetails: req.body.productDetails,  // Assuming this is an array of product objects
         status: req.body.status
       };
@@ -34,7 +34,7 @@ module.exports = {
       const schema = Joi.object({
         orderNumber: Joi.string().required(),
         totalAmount: Joi.number().positive().required(),
-        accountId: Joi.number().integer().required(),
+        userId: Joi.number().integer().required(),
         productDetails: Joi.array().items(
           Joi.object({
             productName: Joi.string().required(),  // Each product must have a name
@@ -57,7 +57,7 @@ module.exports = {
         data: {
           orderNumber: request.orderNumber,
           totalAmount: request.totalAmount,
-          accountId: request.accountId,
+          userId: request.userId,
           status: request.status,
           productDetails: {
             create: request.productDetails.map(product => ({
@@ -94,19 +94,19 @@ module.exports = {
     try {
       sails.log.info("====================== GET ALL ORDERS ==============================");
 
-      // Extract accountId from request query or params
-      const accountId = parseInt(req.query.accountId, 10); // Using query parameter for accountId
+      // Extract userId from request query or params
+      const userId = parseInt(req.query.userId, 10); // Using query parameter for userId
 
-      if (isNaN(accountId)) {
+      if (isNaN(userId)) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "Invalid accountId provided.",
+          message: "Invalid userId provided.",
         });
       }
 
-      // Fetch all orders from the database for the specific accountId
+      // Fetch all orders from the database for the specific userId
       const orders = await prisma.order.findMany({
         where: {
-          accountId: accountId,
+          userId: userId,
         },
       });
 
