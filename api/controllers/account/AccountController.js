@@ -18,8 +18,8 @@ module.exports = {
    */
   adduser: async (req, res) => {
     try {
-      sails.log.info("====================== ADD : user REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== ADD : user REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extracting user info from Request
       const request = {
@@ -54,7 +54,7 @@ module.exports = {
 
       if (existinguser) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "An user with this email already exists.",
+          message: 'An user with this email already exists.',
         });
       }
 
@@ -74,16 +74,16 @@ module.exports = {
       });
 
       // Log the successful user creation
-      sails.log.info("user created successfully:", newuser);
+      sails.log.info('user created successfully:', newuser);
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Account created successfully.",
+        message: 'Account created successfully.',
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while creating the account.",
+        message: 'An error occurred while creating the account.',
       });
     }
   },
@@ -99,8 +99,8 @@ module.exports = {
    */
   editAccount: async (req, res) => {
     try {
-      sails.log.info("====================== EDIT : ACCOUNT REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== EDIT : ACCOUNT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       const id = parseInt(req.query.id); // Assuming the account ID is passed as a URL parameter
       const request = {
@@ -132,7 +132,7 @@ module.exports = {
 
       if (existingAccount) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "An account with this email already doesnt exists.",
+          message: 'An account with this email already doesnt exists.',
         });
       }
 
@@ -149,14 +149,14 @@ module.exports = {
       });
 
 
-      sails.log.info("Account updated successfully:", updatedAccount);
+      sails.log.info('Account updated successfully:', updatedAccount);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Account updated successfully.",
+        message: 'Account updated successfully.',
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while updating the account.",
+        message: 'An error occurred while updating the account.',
       });
     }
   },
@@ -172,8 +172,8 @@ module.exports = {
    */
   deleteAccount: async (req, res) => {
     try {
-      sails.log.info("====================== DELETE : ACCOUNT REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.query);
+      sails.log.info('====================== DELETE : ACCOUNT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.query);
       const accountId = parseInt(req.query.id); // Assuming the account ID is passed as a URL parameter
 
       const account = await prisma.account.findUnique({
@@ -181,9 +181,9 @@ module.exports = {
       });
 
       if (!account || account.deletedAt !== null) {
-        sails.log.warn("Account not found or already deleted:", accountId);
+        sails.log.warn('Account not found or already deleted:', accountId);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Account not found or already deleted.",
+          message: 'Account not found or already deleted.',
         });
       }
       // Delete the account
@@ -194,14 +194,14 @@ module.exports = {
         }
       });
 
-      sails.log.info("Account deleted successfully:", deletedAccount);
+      sails.log.info('Account deleted successfully:', deletedAccount);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Account deleted successfully.",
+        message: 'Account deleted successfully.',
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while deleting the account.",
+        message: 'An error occurred while deleting the account.',
       });
     }
   },
@@ -217,8 +217,8 @@ module.exports = {
    */
   fetchUserDetails: async (req, res) => {
     try {
-      sails.log.info("====================== FETCH : USER DETAILS REQUEST ==============================");
-      sails.log.info("REQ QUERY :", req.query);
+      sails.log.info('====================== FETCH : USER DETAILS REQUEST ==============================');
+      sails.log.info('REQ QUERY :', req.query);
 
       const {accountId} = req.query;
 
@@ -228,30 +228,30 @@ module.exports = {
       });
 
       if (!accountDetails) {
-        sails.log.warn("User not found:", accountId);
+        sails.log.warn('User not found:', accountId);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "User not found.",
+          message: 'User not found.',
         });
       }
 
       // Check if the user has been soft-deleted (i.e., deletedAt is not null)
       if (accountDetails.deletedAt !== null) {
-        sails.log.warn("User has been deleted:", accountId);
+        sails.log.warn('User has been deleted:', accountId);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "User has been deleted.",
+          message: 'User has been deleted.',
         });
       }
 
       // Return user details if found and not deleted
-      sails.log.info("User details fetched successfully:", accountDetails);
+      sails.log.info('User details fetched successfully:', accountDetails);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "User details fetched successfully.",
+        message: 'User details fetched successfully.',
         data: accountDetails,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while fetching user details.",
+        message: 'An error occurred while fetching user details.',
       });
     }
   }
