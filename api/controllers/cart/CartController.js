@@ -239,4 +239,97 @@ module.exports = {
     }
   },
 
+  /**
+   * Update Cart Item
+   * API Endpoint :   /api/cart/update
+   * API Method   :   PUT
+   *
+   * @param   {Object}        req          Request Object From API Request.
+   * @param   {Object}        res          Response Object For API Request.
+   * @returns {Promise<*>}    JSONResponse With success code 200 and updated cart item or relevant error code with message.
+   */
+  updateCartItem: async (req, res) => {
+    try {
+      sails.log.info('====================== UPDATE CART ITEM ==============================');
+      sails.log.info('REQ BODY :', req.body);
+
+      const request = {
+        cartId: req.body.cartId,
+        productId: req.body.productId,
+        quantity: req.body.quantity,
+      }
+      // Validate request parameters
+      const schema = Joi.object().keys({
+        cartId: Joi.string().required(),   // Validate cartId as required string
+        productId: Joi.number().required(), // Validate productId as required string
+        quantity: Joi.number().positive().required(), // Ensure quantity is a positive number
+      });
+
+      // Validate Request from Valid Schema
+      const validateResult = schema.validate(request);
+      if (validateResult.error) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
+          message: validateResult.error.message,
+        });
+      }
+
+      // Check if the cart item exists for the specified cartId and productId
+      const cartItem = await prisma.cart.findUnique({
+        where: {
+          id: request.cartId,
+          productId: request.productId,
+        },
+      });
+      sails.log.debug('cartItem', cartItem);
+
+      if (_.isEmpty(cartItem)) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: 'Cart item not found.',
+        });
+      }
+
+      // Fetch product details
+      const product = await prisma.product.findUnique({
+        where: {
+          id: request.productId,
+        },
+      });
+
+      if (_.isEmpty(product)) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: 'Product not found.',
+        });
+      }
+
+      // Calculate the new total amount based on the quantity
+      const newTotalAmount = product.price * request.quantity;
+
+      // Update the cart item
+      const updatedCartItem = await prisma.cart.update({
+        where: {
+          id: request.cartId, // Update the cart item using its ID
+        },
+        data: {
+          quantity: cartItem.quantity + request.quantity,
+          totalAmount: newTotalAmount,
+        },
+      });
+
+      sails.log.info('Cart item updated successfully:', updatedCartItem);
+
+      // Return Success Response
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
+        message: 'Cart item updated successfully.',
+        data: updatedCartItem,
+      });
+    } catch (exception) {
+      sails.log.error('Error updating cart item:', exception);
+      return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
+        message: 'An error occurred while updating the cart item.',
+      });
+    }
+  },
+  _
+
+
 };

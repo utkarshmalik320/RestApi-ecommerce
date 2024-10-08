@@ -44,7 +44,7 @@ model Order {
 
 model Cart {
   id          String    @id @default(cuid()) // Unique identifier for each cart item
-  userId      Int // Reference to the user who owns the cart
+  userId      Int       @default(0) // Reference to the user who owns the cart
   productId   Int // Reference to the product added to the cart
   productName String    @default("") // Name of the product added to the cart
   variant     String? // Variant of the product, optional
