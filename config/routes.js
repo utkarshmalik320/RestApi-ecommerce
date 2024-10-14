@@ -20,6 +20,7 @@ module.exports.routes = {
   'GET /product/details': { controller: 'products/ProductController', action: 'getProductDetails'},
   'POST /product/category': { controller: 'products/ProductController', action: 'fetchProductsByCategory'},
   'GET /product/category/all': { controller: 'products/ProductController', action: 'fetchUniqueCategories'},
+  'POST /product/review/rating': { controller: 'products/ProductController', action: 'addProductReview'},
 
   // =================Order Controller=====================================
   'POST /order/create': { controller: 'orders/OrderController', action: 'createOrder'},

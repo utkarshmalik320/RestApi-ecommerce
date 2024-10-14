@@ -62,17 +62,20 @@ model Cart {
 }
 
 model Product {
-  id          Int       @id @default(autoincrement()) // Unique product ID
-  name        String // Name of the product
-  description String? // Optional description of the product
-  price       Float // Price of the product
-  brandName   String    @default("Indian Garage") // Default brand name
-  category    String    @default("Fashion") // Default product category
-  stock       Int       @default(0) // Number of items in stock
-  isAvailable Boolean   @default(true) // Availability status
-  createdAt   DateTime  @default(now()) // Timestamp when the product was created
-  updatedAt   DateTime  @updatedAt // Timestamp when the product was last updated
-  deletedAt   DateTime?
+  id              Int       @id @default(autoincrement()) // Unique product ID
+  name            String // Name of the product
+  description     String? // Optional description of the product
+  price           Float // Price of the product
+  brandName       String    @default("Indian Garage") // Default brand name
+  category        String    @default("Fashion") // Default product category
+  stock           Int       @default(0) // Number of items in stock
+  isAvailable     Boolean   @default(true) // Availability status
+  reviews         Json?
+  rating          Float? // Average rating
+  createdAt       DateTime  @default(now()) // Timestamp when the product was created
+  updatedAt       DateTime  @updatedAt // Timestamp when the product was last updated
+  deletedAt       DateTime?
+  numberOfReviews Int       @default(0) // Count of total reviews
 
   @@map("products") // Optional: Customize table name
 }

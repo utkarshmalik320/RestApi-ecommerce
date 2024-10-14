@@ -435,4 +435,124 @@ module.exports = {
       });
     }
   },
+
+  /**
+   * Get All Products by Category
+   * API Endpoint :   /product/category/all
+   * API Method   :   GET
+   *
+   * @param   {Object}        req          Request Object From API Request.
+   * @param   {Object}        res          Response Object For API Request.
+   * @returns {Promise<*>}    JSONResponse With success code 200 and all product details or relevant error code with message.
+   */
+  addProductReview: async (req, res) => {
+    try {
+      sails.log.info('====================== ADD : PRODUCT REVIEW REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
+
+      // Extract review and rating info from Request
+      const request = {
+        userId: req.body.userId, // User ID must be included
+        productId: req.body.productId, // Product ID must be included
+        rating: req.body.rating,
+        review: req.body.review || {}, // Optional review JSON object
+      };
+
+      // Creating Valid Schema for Request
+      const schema = Joi.object().keys({
+        userId: Joi.number().integer().required(), // User ID is required
+        productId: Joi.number().integer().required(), // Product ID is required
+        rating: Joi.number().integer().min(1).max(5).optional(), // Optional rating field (1 to 5)
+        review: Joi.object().keys({
+          text: Joi.string().optional(), // Optional review text
+          images: Joi.array().items(Joi.string().uri()).optional(), // Optional array of image URLs
+        }).optional(), // The review itself is optional
+      });
+
+      // Validate Request from Valid Schema
+      const validateResult = schema.validate(request);
+      if (validateResult.error) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
+          message: validateResult.error.message,
+        });
+      }
+
+      // Check if the product exists
+      const productExists = await prisma.product.findUnique({
+        where: { id: request.productId },
+      });
+
+      if (!productExists) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: 'Product not found.',
+        });
+      }
+
+      // Prepare the new review data
+      const reviewData = {
+        userId: request.userId,
+        text: request.review?.text || null, // Set review text if provided, else null
+        images: request.review?.images || [], // Set images if provided, else empty array
+        timestamp: new Date().toISOString(),
+      };
+
+      // Fetch existing reviews from the product
+      const existingProduct = await prisma.product.findUnique({
+        where: { id: request.productId },
+        select: { reviews: true }, // Select only the reviews field
+      });
+      sails.log.debug('product', existingProduct);
+      // Append the new review to the existing reviews array
+      const updatedReviews = existingProduct.reviews ? [...existingProduct.reviews, reviewData] : [reviewData];
+
+      // Update the product with the new reviews and increment numberOfReviews
+      const updatedProduct = await prisma.product.update({
+        where: { id: request.productId },
+        data: {
+          reviews: updatedReviews, // Save the updated reviews array
+          numberOfReviews: request.rating ? {
+            increment: 1, // Increment the number of reviews by 1
+          } : undefined,
+        },
+      });
+
+      sails.log.debug('Product updated successfully.', updatedProduct.rating);
+
+      // Calculate the new average rating if a rating is provided
+      if (request.rating) {
+        const existingRatings = updatedProduct.rating || 0;
+        const totalReviews = updatedProduct.numberOfReviews || 0;
+
+        // Calculate the new average rating
+        const averageRating = (existingRatings * totalReviews + request.rating) / (totalReviews + 1);
+
+        // Update the product with the new average rating
+        await prisma.product.update({
+          where: { id: request.productId },
+          data: {
+            rating: averageRating, // Update the average rating
+          },
+        });
+      }
+
+      sails.log.info('Review added successfully for product ID:', request.productId);
+
+      // Return Success Response
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
+        message: 'Review and rating added successfully.',
+      });
+    } catch (exception) {
+      sails.log.error(exception);
+      return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
+        message: 'An error occurred while adding the review.',
+      });
+    }
+  }
+
+
+
+
+
+
+
 };
