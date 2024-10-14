@@ -225,7 +225,7 @@ module.exports = {
       sails.log.info('====================== GET : ALL PRODUCTS REQUEST ==============================');
 
       // Get skip and limit values from the query parameters
-      const { skip = 0, limit = 10 } = req.query;
+      const {skip = 0, limit = 10} = req.query;
 
       // Validate skip and limit to ensure they are non-negative integers
       const skipNumber = Math.max(0, parseInt(skip, 10));
@@ -452,21 +452,21 @@ module.exports = {
 
       // Extract review and rating info from Request
       const request = {
-        userId: req.body.userId, // User ID must be included
-        productId: req.body.productId, // Product ID must be included
+        userId: req.body.userId,
+        productId: req.body.productId,
         rating: req.body.rating,
-        review: req.body.review || {}, // Optional review JSON object
+        review: req.body.review || {},
       };
 
       // Creating Valid Schema for Request
       const schema = Joi.object().keys({
-        userId: Joi.number().integer().required(), // User ID is required
-        productId: Joi.number().integer().required(), // Product ID is required
-        rating: Joi.number().integer().min(1).max(5).optional(), // Optional rating field (1 to 5)
+        userId: Joi.number().integer().required(),
+        productId: Joi.number().integer().required(),
+        rating: Joi.number().integer().min(1).max(5).optional(),
         review: Joi.object().keys({
-          text: Joi.string().optional(), // Optional review text
-          images: Joi.array().items(Joi.string().uri()).optional(), // Optional array of image URLs
-        }).optional(), // The review itself is optional
+          text: Joi.string().optional(),
+          images: Joi.array().items(Joi.string().uri()).optional(),
+        }).optional(),
       });
 
       // Validate Request from Valid Schema
@@ -479,7 +479,7 @@ module.exports = {
 
       // Check if the product exists
       const productExists = await prisma.product.findUnique({
-        where: { id: request.productId },
+        where: {id: request.productId},
       });
 
       if (!productExists) {
@@ -488,56 +488,25 @@ module.exports = {
         });
       }
 
-      // Prepare the new review data
+      // Prepare review object for insertion
       const reviewData = {
+        text: request.review.text,
+        images: request.review.images || [],
         userId: request.userId,
-        text: request.review?.text || null, // Set review text if provided, else null
-        images: request.review?.images || [], // Set images if provided, else empty array
         timestamp: new Date().toISOString(),
       };
 
-      // Fetch existing reviews from the product
-      const existingProduct = await prisma.product.findUnique({
-        where: { id: request.productId },
-        select: { reviews: true }, // Select only the reviews field
-      });
-      sails.log.debug('product', existingProduct);
-      // Append the new review to the existing reviews array
-      const updatedReviews = existingProduct.reviews ? [...existingProduct.reviews, reviewData] : [reviewData];
-
-      // Update the product with the new reviews and increment numberOfReviews
+      // Update the product with the new review
       const updatedProduct = await prisma.product.update({
-        where: { id: request.productId },
+        where: {id: request.productId},
         data: {
-          reviews: updatedReviews, // Save the updated reviews array
-          numberOfReviews: request.rating ? {
-            increment: 1, // Increment the number of reviews by 1
-          } : undefined,
+          reviews: reviewData,
+          rating: request.rating
         },
       });
 
-      sails.log.debug('Product updated successfully.', updatedProduct.rating);
+      sails.log.debug('Product updated successfully.', updatedProduct);
 
-      // Calculate the new average rating if a rating is provided
-      if (request.rating) {
-        const existingRatings = updatedProduct.rating || 0;
-        const totalReviews = updatedProduct.numberOfReviews || 0;
-
-        // Calculate the new average rating
-        const averageRating = (existingRatings * totalReviews + request.rating) / (totalReviews + 1);
-
-        // Update the product with the new average rating
-        await prisma.product.update({
-          where: { id: request.productId },
-          data: {
-            rating: averageRating, // Update the average rating
-          },
-        });
-      }
-
-      sails.log.info('Review added successfully for product ID:', request.productId);
-
-      // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
         message: 'Review and rating added successfully.',
       });
@@ -548,11 +517,6 @@ module.exports = {
       });
     }
   }
-
-
-
-
-
 
 
 };
