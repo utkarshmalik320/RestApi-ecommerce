@@ -14,7 +14,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model user {
+model User {
   id          Int       @id @default(autoincrement())
   firstName   String
   lastName    String
@@ -25,7 +25,7 @@ model user {
   updatedAt   DateTime  @default(now())
   deletedAt   DateTime?
 
-  @@map("user") // Optional: Customize table name
+  @@map("users")
 }
 
 model Order {

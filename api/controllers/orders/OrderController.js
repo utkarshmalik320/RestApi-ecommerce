@@ -1,9 +1,9 @@
 const Joi = require('joi');
 const _ = require('lodash');
-const ResponseService = require("../../services/ResponseService");
-const ConstantService = require("../../services/ConstantService");
-const prisma = require("../../../prisma/client");
-const {parse} = require("dotenv");
+const ResponseService = require('../../services/ResponseService');
+const ConstantService = require('../../services/ConstantService');
+const prisma = require('../../../prisma/client');
+const {parse} = require('dotenv');
 
 module.exports = {
 
@@ -18,8 +18,8 @@ module.exports = {
    */
   createOrder: async (req, res) => {
     try {
-      sails.log.info("====================== CREATE ORDER : ORDER REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== CREATE ORDER : ORDER REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extracting order details from request
       const request = {
@@ -68,15 +68,15 @@ module.exports = {
         },
       });
 
-      sails.log.info("Order created successfully:", newOrder);
+      sails.log.info('Order created successfully:', newOrder);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Order created successfully.",
+        message: 'Order created successfully.',
         data: newOrder,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while creating the order.",
+        message: 'An error occurred while creating the order.',
       });
     }
   },
@@ -92,14 +92,14 @@ module.exports = {
    */
   getAllOrders: async (req, res) => {
     try {
-      sails.log.info("====================== GET ALL ORDERS ==============================");
+      sails.log.info('====================== GET ALL ORDERS ==============================');
 
       // Extract userId from request query or params
       const userId = parseInt(req.query.userId, 10); // Using query parameter for userId
 
       if (isNaN(userId)) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "Invalid userId provided.",
+          message: 'Invalid userId provided.',
         });
       }
 
@@ -112,20 +112,20 @@ module.exports = {
 
       if (orders.length === 0) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "No orders found for this account.",
+          message: 'No orders found for this account.',
           data: [],
         });
       }
 
-      sails.log.info("Orders retrieved successfully:", orders);
+      sails.log.info('Orders retrieved successfully:', orders);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Orders retrieved successfully.",
+        message: 'Orders retrieved successfully.',
         data: orders,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while retrieving the orders.",
+        message: 'An error occurred while retrieving the orders.',
       });
     }
   },
@@ -141,19 +141,19 @@ module.exports = {
    */
   getSingleOrder: async (req, res) => {
     try {
-      sails.log.info("====================== GET SINGLE ORDER ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== GET SINGLE ORDER ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
 
       // Extract product info from Request
       const request = {
-        accountId: req.body.accountId,
+        userId: req.body.userId,
         orderId: req.body.orderId,
       };
 
       // Creating Valid Schema for Request
       const schema = Joi.object().keys({
-        accountId: Joi.number().required(),
+        userId: Joi.number().required(),
         orderId: Joi.number().required(),
       });
 
@@ -167,35 +167,35 @@ module.exports = {
       }
 
       // Validate accountId and orderId
-      if (!request.accountId || !request.orderId) {
+      if (!request.userId || !request.orderId) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "accountId and orderId must be provided in the request body.",
+          message: 'accountId and orderId must be provided in the request body.',
         });
       }
 
       // Fetch the specific order from the database for the given accountId and orderId
       const order = await prisma.order.findFirst({
         where: {
-          accountId: request.accountId,
+          userId: request.userId,
           id: request.orderId,
         },
       });
 
       if (_.isEmpty(order)) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Order not found for the specified account.",
+          message: 'Order not found for the specified account.',
         });
       }
 
-      sails.log.info("Order retrieved successfully:", order);
+      sails.log.info('Order retrieved successfully:', order);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Order retrieved successfully.",
+        message: 'Order retrieved successfully.',
         data: order,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while retrieving the order.",
+        message: 'An error occurred while retrieving the order.',
       });
     }
   },
@@ -211,19 +211,19 @@ module.exports = {
    */
   updateOrderStatus: async (req, res) => {
     try {
-      sails.log.info("====================== UPDATE ORDER STATUS ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== UPDATE ORDER STATUS ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extract accountId and orderId from request body
       const request = {
-        accountId: req.body.accountId,
+        userId: req.body.userId,
         orderId: req.body.orderId,
         status: req.body.status // Also extract status for later use
       };
 
       // Creating Valid Schema for Request
       const schema = Joi.object({
-        accountId: Joi.number().required(),
+        userId: Joi.number().required(),
         orderId: Joi.number().required(),
         status: Joi.string().valid('pending', 'shipped', 'delivered', 'canceled').required() // Validate status
       });
@@ -251,7 +251,7 @@ module.exports = {
       const updatedOrder = await prisma.order.updateMany({
         where: {
           id: request.orderId, // Use the validated orderId
-          accountId: request.accountId, // Use the validated accountId
+          userId: request.userId, // Use the validated accountId
         },
         data: updateData,
       });
@@ -259,19 +259,19 @@ module.exports = {
       // Check if the order was updated
       if (updatedOrder.count === 0) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Order not found or no changes made.",
+          message: 'Order not found or no changes made.',
         });
       }
 
-      sails.log.info("Order status updated successfully:", updatedOrder);
+      sails.log.info('Order status updated successfully:', updatedOrder);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Order status updated successfully.",
+        message: 'Order status updated successfully.',
         data: { orderId: request.orderId, newStatus: request.status },
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while updating the order status.",
+        message: 'An error occurred while updating the order status.',
       });
     }
   },

@@ -4,7 +4,7 @@ const ResponseService = require('../../services/ResponseService'); // Update the
 const ConstantService = require('../../services/ConstantService'); // Update the path as needed
 const prisma = require('../../../prisma/client'); // Import Prisma client
 const bcrypt = require('bcrypt');
-const {parse} = require("dotenv");
+const {parse} = require('dotenv');
 
 
 module.exports = {
@@ -19,8 +19,8 @@ module.exports = {
    */
   addSeller: async (req, res) => {
     try {
-      sails.log.info("====================== ADD : SELLER REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== ADD : SELLER REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extracting Seller info from Request
       const request = {
@@ -55,7 +55,7 @@ module.exports = {
 
       if (existingSeller) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "A seller with this email already exists.",
+          message: 'A seller with this email already exists.',
         });
       }
 
@@ -74,16 +74,16 @@ module.exports = {
       });
 
       // Log the successful seller creation
-      sails.log.info("Seller created successfully:", newSeller);
+      sails.log.info('Seller created successfully:', newSeller);
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Seller created successfully.",
+        message: 'Seller created successfully.',
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while creating the seller.",
+        message: 'An error occurred while creating the seller.',
       });
     }
   },
@@ -99,8 +99,8 @@ module.exports = {
    */
   editSeller: async (req, res) => {
     try {
-      sails.log.info("====================== EDIT : SELLER REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== EDIT : SELLER REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extracting Seller info from Request
       const request = {
@@ -133,7 +133,7 @@ module.exports = {
 
       if (_.isEmpty(existingAccount)) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "An account with this email already doesnt exists.",
+          message: 'An account with this email already doesnt exists.',
         });
       }
 
@@ -143,15 +143,15 @@ module.exports = {
         data: request,
       });
 
-      sails.log.info("Seller updated successfully:", updatedSeller);
+      sails.log.info('Seller updated successfully:', updatedSeller);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Seller updated successfully.",
+        message: 'Seller updated successfully.',
         data: updatedSeller,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while updating the seller.",
+        message: 'An error occurred while updating the seller.',
       });
     }
   },
@@ -168,8 +168,8 @@ module.exports = {
   deleteSeller: async (req, res) => {
     try {
       const sellerId = parseInt(req.query.id); // Get seller ID from request parameters
-      sails.log.info("====================== DELETE : SELLER REQUEST ==============================");
-      sails.log.debug("sellerId  :", sellerId);
+      sails.log.info('====================== DELETE : SELLER REQUEST ==============================');
+      sails.log.debug('sellerId  :', sellerId);
       // Soft delete the seller by setting deletedAt timestamp
       const deletedSeller = await prisma.seller.update({
         where: {
@@ -182,13 +182,13 @@ module.exports = {
 
       sails.log.info(`Seller with ID ${sellerId} marked as deleted successfully.`);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Seller marked as deleted successfully.",
+        message: 'Seller marked as deleted successfully.',
         data: deletedSeller,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while marking the seller as deleted.",
+        message: 'An error occurred while marking the seller as deleted.',
       });
     }
   },
@@ -204,11 +204,11 @@ module.exports = {
    */
   fetchSellerDetails: async (req, res) => {
     try {
-      sails.log.info("====================== FETCH : SELLER ACCOUNT DETAILS REQUEST ==============================");
-      sails.log.info("REQ QUERY :", req.query);
+      sails.log.info('====================== FETCH : SELLER ACCOUNT DETAILS REQUEST ==============================');
+      sails.log.info('REQ QUERY :', req.query);
 
       const sellerId = parseInt(req.query.id);
-      sails.log.debug("sellerId" , sellerId)
+      sails.log.debug('sellerId' , sellerId)
 
       // Fetch the user details
       const sellerAccountDetails = await prisma.seller.findUnique({
@@ -216,30 +216,30 @@ module.exports = {
       });
 
       if (!sellerAccountDetails) {
-        sails.log.warn("Seller not found:", sellerId);
+        sails.log.warn('Seller not found:', sellerId);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Seller  not found.",
+          message: 'Seller  not found.',
         });
       }
 
       // Check if the user has been soft-deleted (i.e., deletedAt is not null)
       if (sellerAccountDetails.deletedAt !== null) {
-        sails.log.warn("Seller account has been deleted:", sellerId);
+        sails.log.warn('Seller account has been deleted:', sellerId);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Seller Account has been deleted.",
+          message: 'Seller Account has been deleted.',
         });
       }
 
       // Return user details if found and not deleted
-      sails.log.info("Seller Account details fetched successfully:", sellerAccountDetails);
+      sails.log.info('Seller Account details fetched successfully:', sellerAccountDetails);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Seller Account details fetched successfully.",
+        message: 'Seller Account details fetched successfully.',
         data: sellerAccountDetails,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while fetching seller details.",
+        message: 'An error occurred while fetching seller details.',
       });
     }
   }

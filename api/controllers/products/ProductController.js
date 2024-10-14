@@ -1,7 +1,7 @@
 const Joi = require('joi'); // Ensure you have Joi installed
-const ResponseService = require("../../services/ResponseService");
-const ConstantService = require("../../services/ConstantService");
-const prisma = require("../../../prisma/client");
+const ResponseService = require('../../services/ResponseService');
+const ConstantService = require('../../services/ConstantService');
+const prisma = require('../../../prisma/client');
 
 
 module.exports = {
@@ -17,8 +17,8 @@ module.exports = {
    */
   addProduct: async (req, res) => {
     try {
-      sails.log.info("====================== ADD : PRODUCT REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== ADD : PRODUCT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extract product info from Request
       const request = {
@@ -58,17 +58,17 @@ module.exports = {
         },
       });
 
-      sails.log.info("Product created successfully:", newProduct);
+      sails.log.info('Product created successfully:', newProduct);
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Product created successfully.",
+        message: 'Product created successfully.',
         data: newProduct,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while creating the product.",
+        message: 'An error occurred while creating the product.',
       });
     }
   },
@@ -84,8 +84,8 @@ module.exports = {
    */
   editProduct: async (req, res) => {
     try {
-      sails.log.info("====================== EDIT : PRODUCT REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== EDIT : PRODUCT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extract product info from Request
       const request = {
@@ -127,17 +127,17 @@ module.exports = {
         },
       });
 
-      sails.log.info("Product updated successfully:", updatedProduct);
+      sails.log.info('Product updated successfully:', updatedProduct);
 
       // Return success response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Product updated successfully.",
+        message: 'Product updated successfully.',
         data: updatedProduct,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while updating the product.",
+        message: 'An error occurred while updating the product.',
       });
     }
   },
@@ -153,8 +153,8 @@ module.exports = {
    */
   deleteProduct: async (req, res) => {
     try {
-      sails.log.info("====================== DELETE : PRODUCT REQUEST ==============================");
-      sails.log.info("REQ PARAMS :", req.query);
+      sails.log.info('====================== DELETE : PRODUCT REQUEST ==============================');
+      sails.log.info('REQ PARAMS :', req.query);
 
       const {productId} = req.query;
 
@@ -178,13 +178,13 @@ module.exports = {
 
       if (!existingProduct) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Product not found.",
+          message: 'Product not found.',
         });
       }
 
       if (existingProduct.deletedAt) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "Product is already deleted.",
+          message: 'Product is already deleted.',
         });
       }
 
@@ -196,17 +196,17 @@ module.exports = {
         },
       });
 
-      sails.log.info("Product soft deleted successfully:", productId);
+      sails.log.info('Product soft deleted successfully:', productId);
 
       // Return success response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Product soft deleted successfully.",
+        message: 'Product soft deleted successfully.',
         data: deletedProduct,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while deleting the product.",
+        message: 'An error occurred while deleting the product.',
       });
     }
   },
@@ -222,7 +222,7 @@ module.exports = {
    */
   getAllProducts: async (req, res) => {
     try {
-      sails.log.info("====================== GET : ALL PRODUCTS REQUEST ==============================");
+      sails.log.info('====================== GET : ALL PRODUCTS REQUEST ==============================');
 
       // Get skip and limit values from the query parameters
       const { skip = 0, limit = 10 } = req.query;
@@ -246,18 +246,18 @@ module.exports = {
         },
       });
 
-      sails.log.info("All products fetched successfully:", products);
+      sails.log.info('All products fetched successfully:', products);
 
       // Return success response with products and total count for pagination
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "All products fetched successfully.",
+        message: 'All products fetched successfully.',
         data: products,
         totalCount, // Total count for pagination purposes
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while fetching the products.",
+        message: 'An error occurred while fetching the products.',
       });
     }
   },
@@ -273,8 +273,8 @@ module.exports = {
    */
   getProductDetails: async (req, res) => {
     try {
-      sails.log.info("====================== GET : PRODUCT DETAILS REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.query);
+      sails.log.info('====================== GET : PRODUCT DETAILS REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.query);
 
       const {productId} = req.query;
 
@@ -298,27 +298,27 @@ module.exports = {
 
       if (!product) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Product not found.",
+          message: 'Product not found.',
         });
       }
 
       if (product.deletedAt !== null) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "Product has been deleted.",
+          message: 'Product has been deleted.',
         });
       }
 
-      sails.log.info("Product details fetched successfully:", product);
+      sails.log.info('Product details fetched successfully:', product);
 
       // Return success response with product details
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Product details fetched successfully.",
+        message: 'Product details fetched successfully.',
         data: product,
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while fetching the product details.",
+        message: 'An error occurred while fetching the product details.',
       });
     }
   },
@@ -334,8 +334,8 @@ module.exports = {
    */
   fetchProductsByCategory: async (req, res) => {
     try {
-      sails.log.info("====================== FETCH BY PRODUCTS : PRODUCT REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== FETCH BY PRODUCTS : PRODUCT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       // Extract category, skip, and limit info from Request
       const request = {
@@ -375,19 +375,19 @@ module.exports = {
       // Check if products are found
       if (products.length === 0) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "No products found for this category.",
+          message: 'No products found for this category.',
         });
       }
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Products fetched successfully.",
+        message: 'Products fetched successfully.',
         data: products,
       });
     } catch (exception) {
-      sails.log.error("Error fetching products by category:", exception);
+      sails.log.error('Error fetching products by category:', exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while fetching products.",
+        message: 'An error occurred while fetching products.',
       });
     }
   },
@@ -403,7 +403,7 @@ module.exports = {
    */
   fetchUniqueCategories: async (req, res) => {
     try {
-      sails.log.info("====================== FETCH UNIQUE CATEGORIES ==============================");
+      sails.log.info('====================== FETCH UNIQUE CATEGORIES ==============================');
 
       // Fetch unique categories from the product table
       const uniqueCategories = await prisma.product.findMany({
@@ -416,7 +416,7 @@ module.exports = {
       // Check if any categories were found
       if (uniqueCategories.length === 0) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
-          message: "No categories found.",
+          message: 'No categories found.',
         });
       }
 
@@ -425,13 +425,13 @@ module.exports = {
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Unique categories fetched successfully.",
+        message: 'Unique categories fetched successfully.',
         data: categories,
       });
     } catch (exception) {
-      sails.log.error("Error fetching unique categories:", exception);
+      sails.log.error('Error fetching unique categories:', exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while fetching unique categories.",
+        message: 'An error occurred while fetching unique categories.',
       });
     }
   },

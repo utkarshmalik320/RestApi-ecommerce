@@ -8,9 +8,9 @@
  * https://sailsjs.com/docs/concepts/configuration/the-local-js-file
  */
 
-module.exports = {
-
-  // Any configuration settings may be overridden below, whether it's built-in Sails
-  // options or custom configuration specifically for your app (e.g. Stripe, Sendgrid, etc.)
-
+module.exports.redis = {
+  host: 'localhost', // Redis server hostname
+  port: 6379,        // Redis server port (default is 6379)
+  password: 'your_password', // Redis server password (only if authentication is required)
+  db: 0,             // Redis database index to use
 };

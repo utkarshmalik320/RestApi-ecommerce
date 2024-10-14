@@ -28,7 +28,7 @@ module.exports = {
       response.message = ConstantService.responseMessage.ERR_OOPS_SOMETHING_WENT_WRONG;
     }
 
-    // LogService.info("RESPONSE :", response);
+    // LogService.info('RESPONSE :', response);
     return res.status(status).json(response);
   },
 
@@ -48,7 +48,7 @@ module.exports = {
       response = data;
     }
 
-    // LogService.info("RESPONSE :", response);
+    // LogService.info('RESPONSE :', response);
     return res.status(status).json(response);
   },
 

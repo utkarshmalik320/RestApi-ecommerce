@@ -4,6 +4,7 @@ const ResponseService = require('../../services/ResponseService'); // Update the
 const ConstantService = require('../../services/ConstantService'); // Update the path as needed
 const prisma = require('../../../prisma/client'); // Import Prisma client
 const bcrypt = require('bcrypt');
+const {number} = require("joi");
 
 module.exports = {
 
@@ -16,7 +17,7 @@ module.exports = {
    * @param   {Object}        res          Response Object For API Request.
    * @returns {Promise<*>}    JSONResponse With success code 200 and  information or relevant error code with message.
    */
-  adduser: async (req, res) => {
+  addUser: async (req, res) => {
     try {
       sails.log.info('====================== ADD : user REQUEST ==============================');
       sails.log.info('REQ BODY :', req.body);
@@ -49,7 +50,7 @@ module.exports = {
 
       // Check for existing user by email
       const existinguser = await prisma.user.findUnique({
-        where: { email: request.email },
+        where: {email: request.email},
       });
 
       if (existinguser) {
@@ -63,7 +64,7 @@ module.exports = {
 
       // Create the new address entry first
       // Now create the new user, linking it to the address
-      const newuser = await prisma.user.create({
+      const newUser = await prisma.user.create({
         data: {
           firstName: request.firstName,
           lastName: request.lastName,
@@ -74,7 +75,7 @@ module.exports = {
       });
 
       // Log the successful user creation
-      sails.log.info('user created successfully:', newuser);
+      sails.log.info('user created successfully:', newUser);
 
       // Return Success Response
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
@@ -97,12 +98,14 @@ module.exports = {
    * @param   {Object}        res          Response Object For API Request.
    * @returns {Promise<*>}    JSONResponse With success code 200 and  information or relevant error code with message.
    */
-  editAccount: async (req, res) => {
+  editUser: async (req, res) => {
     try {
       sails.log.info('====================== EDIT : ACCOUNT REQUEST ==============================');
       sails.log.info('REQ BODY :', req.body);
+      sails.log.info('REQ QUERY :', req.query);
 
-      const id = parseInt(req.query.id); // Assuming the account ID is passed as a URL parameter
+      const {id} = req.query; // Assuming the account ID is passed as a URL parameter
+
       const request = {
         email: req.body.email,
         firstName: req.body.firstName,
@@ -126,8 +129,8 @@ module.exports = {
       }
 
       // Check for existing account by email
-      const existingAccount = await prisma.account.findUnique({
-        where: { email: request.email },
+      const existingAccount = await prisma.user.findUnique({
+        where: {email: request.email},
       });
 
       if (existingAccount) {
@@ -138,8 +141,8 @@ module.exports = {
 
       // Update the account
       // Update the account
-      const updatedAccount = await prisma.account.update({
-        where: { id: id }, // Make sure `request.id` exists and is correct
+      const updatedAccount = await prisma.user.update({
+        where: {id: Number(id)}, // Make sure `request.id` exists and is correct
         data: {
           email: request.email, // Ensure `request.email` is not null if updating
           firstName: request.firstName, // Same for other fields_
@@ -170,25 +173,25 @@ module.exports = {
    * @param   {Object}        res          Response Object For API Request.
    * @returns {Promise<*>}    JSONResponse With success code 200 and  information or relevant error code with message.
    */
-  deleteAccount: async (req, res) => {
+  deleteUser: async (req, res) => {
     try {
       sails.log.info('====================== DELETE : ACCOUNT REQUEST ==============================');
       sails.log.info('REQ BODY :', req.query);
-      const accountId = parseInt(req.query.id); // Assuming the account ID is passed as a URL parameter
+      const { id }= req.query; // Assuming the account ID is passed as a URL parameter
 
-      const account = await prisma.account.findUnique({
-        where: { id: accountId },
+      const account = await prisma.user.findUnique({
+        where: {id: Number(id)},
       });
 
       if (!account || account.deletedAt !== null) {
-        sails.log.warn('Account not found or already deleted:', accountId);
+        sails.log.warn('Account not found or already deleted:', id);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
           message: 'Account not found or already deleted.',
         });
       }
       // Delete the account
-      const deletedAccount = await prisma.account.update({
-        where: { id: accountId },
+      const deletedAccount = await prisma.user.update({
+        where: {id: Number(id)},
         data: {
           deletedAt: new Date().toISOString(),
         }
@@ -220,15 +223,23 @@ module.exports = {
       sails.log.info('====================== FETCH : USER DETAILS REQUEST ==============================');
       sails.log.info('REQ QUERY :', req.query);
 
-      const {accountId} = req.query;
+      const {id} = req.query;
+      sails.log.warn('User has been deleted:', id);
 
+      if (!id || isNaN(id)) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
+          message: 'Invalid account ID provided.',
+        });
+      }
       // Fetch the user details
-      const accountDetails = await prisma.account.findUnique({
-        where: { id: Number(accountId) },
-      });
 
+      const parsedAccountId = Number(id);
+
+      const accountDetails = await prisma.user.findUnique({
+        where: {id: parsedAccountId},
+      });
       if (!accountDetails) {
-        sails.log.warn('User not found:', accountId);
+        sails.log.warn('User not found:', id);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
           message: 'User not found.',
         });
@@ -236,7 +247,7 @@ module.exports = {
 
       // Check if the user has been soft-deleted (i.e., deletedAt is not null)
       if (accountDetails.deletedAt !== null) {
-        sails.log.warn('User has been deleted:', accountId);
+        sails.log.warn('User has been deleted:', id);
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
           message: 'User has been deleted.',
         });

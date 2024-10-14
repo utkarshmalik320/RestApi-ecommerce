@@ -3,7 +3,7 @@ const ConstantService = require('../../services/ConstantService'); // Update the
 const prisma = require('../../../prisma/client'); // Import Prisma client
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Joi = require("joi");
+const Joi = require('joi');
 
 module.exports = {
 
@@ -16,51 +16,51 @@ module.exports = {
    * @param   {Object}        res          Response Object For API Request.
    * @returns {Promise<*>}    JSONResponse With success code 200 and information or relevant error code with message.
    */
-   login: async (req, res) => {
-      try {
-        sails.log.info("====================== LOGIN : SELLER ACCOUNT REQUEST ==============================");
-        sails.log.info("REQ BODY :", req.body);
+  login: async (req, res) => {
+    try {
+      sails.log.info('====================== LOGIN : SELLER ACCOUNT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
-        const request = {
-          email: req.body.email,
-          password: req.body.password,
-        }
+      const request = {
+        email: req.body.email,
+        password: req.body.password,
+      }
 
-        const schema = Joi.object().keys({
-          email: Joi.string().email().required(),
-          password: Joi.string().min(6).required(),
+      const schema = Joi.object().keys({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).required(),
+      });
+
+      const validateResult = schema.validate(request);
+      if (validateResult.error) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
+          message: validateResult.error.message,
         });
-
-        const validateResult = schema.validate(request);
-        if (validateResult.error) {
-          return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-            message: validateResult.error.message,
-          });
-        }
+      }
 
 
       // Find the seller by email
-        const seller = await prisma.seller.findUnique({
-          select: {
-            password: true, // Correctly selecting the password field
-          },
-          where: {
-            email: request.email,
-          },
-        });
+      const seller = await prisma.seller.findUnique({
+        select: {
+          password: true, // Correctly selecting the password field
+        },
+        where: {
+          email: request.email,
+        },
+      });
 
       if (_.isEmpty(seller)) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.UNAUTHORIZED, {
-          message: "Invalid email or password.",
+          message: 'Invalid email or password.',
         });
       }
-      sails.log.debug("seller",seller);
+      sails.log.debug('seller', seller);
 
       // Check password
       const isPasswordValid = await bcrypt.compare(request.password, seller.password);
       if (!isPasswordValid) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.UNAUTHORIZED, {
-          message: "Invalid email or password.",
+          message: 'Invalid email or password.',
         });
       }
 
@@ -70,15 +70,15 @@ module.exports = {
       });
 
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Login successful.",
+        message: 'Login successful.',
         token,
       });
-      } catch (exception) {
-        sails.log.error(exception);
-        return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while logging in.",
+    } catch (exception) {
+      sails.log.error(exception);
+      return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
+        message: 'An error occurred while logging in.',
       });
-      }
+    }
   },
 
   /**
@@ -92,15 +92,15 @@ module.exports = {
    */
   logout: async (req, res) => {
     try {
-      sails.log.info("====================== LOGOUT : SELLER ACCOUNT REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== LOGOUT : SELLER ACCOUNT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Logout successful.",
+        message: 'Logout successful.',
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while logging out.",
+        message: 'An error occurred while logging out.',
       });
     }
   },
@@ -116,8 +116,8 @@ module.exports = {
    */
   resetPassword: async (req, res) => {
     try {
-      sails.log.info("====================== RESET-PASSWORD : SELLER ACCOUNT REQUEST ==============================");
-      sails.log.info("REQ BODY :", req.body);
+      sails.log.info('====================== RESET-PASSWORD : SELLER ACCOUNT REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
 
       const request = {
         email: req.body.email,
@@ -138,12 +138,12 @@ module.exports = {
 
       // Find the seller by email
       const seller = await prisma.seller.findUnique({
-        where: { email: request.email },
+        where: {email: request.email},
       });
 
       if (_.isEmpty(seller)) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
-          message: "Seller not found.",
+          message: 'Seller not found.',
         });
       }
 
@@ -152,17 +152,17 @@ module.exports = {
 
       // Update the seller's password
       await prisma.seller.update({
-        where: { email: request.email },
-        data: { password: hashedPassword },
+        where: {email: request.email},
+        data: {password: hashedPassword},
       });
 
       return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
-        message: "Password reset successfully.",
+        message: 'Password reset successfully.',
       });
     } catch (exception) {
       sails.log.error(exception);
       return ResponseService.json(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
-        message: "An error occurred while resetting the password.",
+        message: 'An error occurred while resetting the password.',
       });
     }
   },

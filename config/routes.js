@@ -2,15 +2,15 @@
 module.exports.routes = {
   // =================user Controller=====================================
 
-  'POST /user/add': { controller: 'user/userController', action: 'adduser'},
-  'POST /user/edit': { controller: 'user/userController', action: 'edituser'},
-  'DELETE /user/delete': { controller: 'user/userController', action: 'deleteuser'},
-  'GET /user/details': { controller: 'user/userController', action: 'fetchUserDetails'},
+  'POST /user/add': { controller: 'account/AccountController', action: 'addUser'},
+  'POST /user/edit': { controller: 'account/AccountController', action: 'editUser'},
+  'DELETE /user/delete': { controller: 'account/AccountController', action: 'deleteUser'},
+  'GET /user/details': { controller: 'account/AccountController', action: 'fetchUserDetails'},
 
   // =================Apps Controller=====================================
   'POST /user/reset-password': { controller: 'apps/AppsController', action: 'resetPassword'},
-  'POST /user/login': { controller: 'apps/AppsController', action: 'loginuser'},
-  'POST /user/logout': { controller: 'apps/AppsController', action: 'logoutuser'},
+  'POST /user/login': { controller: 'apps/AppsController', action: 'loginUser'},
+  'POST /user/logout': { controller: 'apps/AppsController', action: 'logoutUser'},
 
   // =================Product Controller=====================================
   'POST /product/add': { controller: 'products/ProductController', action: 'addProduct'},

@@ -8,7 +8,7 @@ module.exports = {
     INTERNAL_SERVER_ERROR: 500
   },
   responseMessage:{
-    ERR_OOPS_SOMETHING_WENT_WRONG:"Something went wrong.",
+    ERR_OOPS_SOMETHING_WENT_WRONG:'Something went wrong.',
 
   }
 }
