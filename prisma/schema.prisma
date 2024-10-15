@@ -24,6 +24,7 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
   deletedAt   DateTime?
+  Review      Review[]
 
   @@map("users")
 }
@@ -62,22 +63,36 @@ model Cart {
 }
 
 model Product {
-  id              Int       @id @default(autoincrement()) // Unique product ID
-  name            String // Name of the product
-  description     String? // Optional description of the product
-  price           Float // Price of the product
-  brandName       String    @default("Indian Garage") // Default brand name
-  category        String    @default("Fashion") // Default product category
-  stock           Int       @default(0) // Number of items in stock
-  isAvailable     Boolean   @default(true) // Availability status
-  reviews         Json?
-  rating          Float? // Average rating
-  createdAt       DateTime  @default(now()) // Timestamp when the product was created
-  updatedAt       DateTime  @updatedAt // Timestamp when the product was last updated
-  deletedAt       DateTime?
-  numberOfReviews Int       @default(0) // Count of total reviews
+  id          Int       @id @default(autoincrement()) // Unique product ID
+  name        String // Name of the product
+  description String? // Optional description of the product
+  price       Float // Price of the product
+  brandName   String    @default("Indian Garage") // Default brand name
+  category    String    @default("Fashion") // Default product category
+  stock       Int       @default(0) // Number of items in stock
+  isAvailable Boolean   @default(true) // Availability status
+  createdAt   DateTime  @default(now()) // Timestamp when the product was created
+  updatedAt   DateTime  @updatedAt // Timestamp when the product was last updated
+  deletedAt   DateTime?
+  reviews     Review[] // One-to-many relationship with reviews
 
   @@map("products") // Optional: Customize table name
+}
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  rating    Int // Rating for the product (e.g., 1 to 5 stars)
+  comment   String? // Optional review comment
+  images    String[] // Array of image URLs stored in the review
+  product   Product   @relation(fields: [productId], references: [id]) // Relationship to Product
+  productId Int
+  user      User      @relation(fields: [userId], references: [id]) // Relationship to User
+  userId    Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("review")
 }
 
 model Seller {

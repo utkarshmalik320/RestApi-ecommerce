@@ -455,7 +455,8 @@ module.exports = {
         userId: req.body.userId,
         productId: req.body.productId,
         rating: req.body.rating,
-        review: req.body.review || {},
+        comment: req.body.comment,
+        images:req.body.images,
       };
 
       // Creating Valid Schema for Request
@@ -463,10 +464,8 @@ module.exports = {
         userId: Joi.number().integer().required(),
         productId: Joi.number().integer().required(),
         rating: Joi.number().integer().min(1).max(5).optional(),
-        review: Joi.object().keys({
-          text: Joi.string().optional(),
-          images: Joi.array().items(Joi.string().uri()).optional(),
-        }).optional(),
+        comment:Joi.string().required(),
+        images: Joi.array().items(Joi.string().uri()).optional()
       });
 
       // Validate Request from Valid Schema
@@ -481,27 +480,21 @@ module.exports = {
       const productExists = await prisma.product.findUnique({
         where: {id: request.productId},
       });
-
-      if (!productExists) {
+      sails.log.info('Products fetched successfully.', productExists);
+      if (!productExists || productExists.deletedAt) {
         return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
           message: 'Product not found.',
         });
       }
 
-      // Prepare review object for insertion
-      const reviewData = {
-        text: request.review.text,
-        images: request.review.images || [],
-        userId: request.userId,
-        timestamp: new Date().toISOString(),
-      };
-
       // Update the product with the new review
-      const updatedProduct = await prisma.product.update({
-        where: {id: request.productId},
+      const updatedProduct = await prisma.review.create({
         data: {
-          reviews: reviewData,
-          rating: request.rating
+          userId:request.userId,
+          productId: request.productId,
+          rating: request.rating,
+          comment:request.comment,
+          images:request.images,
         },
       });
 
@@ -516,7 +509,198 @@ module.exports = {
         message: 'An error occurred while adding the review.',
       });
     }
+  },
+
+  /**
+   * Update Product Review
+   * API Endpoint :   /product/review/update
+   * API Method   :   PUT
+   *
+   * @param   {Object}        req          Request Object From API Request.
+   * @param   {Object}        res          Response Object For API Request.
+   * @returns {Promise<*>}    JSONResponse with success code 200 if updated, or relevant error code with message.
+   */
+  updateProductReview: async (req, res) => {
+    try {
+      sails.log.info('====================== UPDATE : PRODUCT REVIEW REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
+
+      // Extract review and rating info from Request
+      const request = {
+        userId: req.body.userId,
+        reviewId: req.body.reviewId,
+        rating: req.body.rating,
+        comment: req.body.comment,
+        images: req.body.images,
+      };
+
+      // Creating Valid Schema for Request
+      const schema = Joi.object().keys({
+        userId: Joi.number().integer().required(),
+        reviewId: Joi.number().integer().required(),
+        rating: Joi.number().integer().min(1).max(5).optional(),
+        comment: Joi.string().optional(),
+        images: Joi.array().items(Joi.string().uri()).optional(),
+      });
+
+      // Validate Request from Valid Schema
+      const validateResult = schema.validate(request);
+      if (validateResult.error) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
+          message: validateResult.error.message,
+        });
+      }
+
+      // Check if the review exists
+      const reviewExists = await prisma.review.findUnique({
+        where: { id: request.reviewId, userId: request.userId },
+      });
+
+      if (!reviewExists) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: 'Review not found.',
+        });
+      }
+
+      // Update the review with the new data
+      const updatedReview = await prisma.review.update({
+        where: { id: request.reviewId },
+        data: {
+          rating: request.rating,
+          comment: request.comment,
+          images: request.images,
+        },
+      });
+
+      sails.log.info('Review updated successfully.', updatedReview);
+
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
+        message: 'Review updated successfully.',
+      });
+    } catch (exception) {
+      sails.log.error(exception);
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
+        message: 'An error occurred while updating the review.',
+      });
+    }
+  },
+
+  /**
+   * Delete Product Review
+   * API Endpoint :   /product/review/delete
+   * API Method   :   DELETE
+   *
+   * @param   {Object}        req          Request Object From API Request.
+   * @param   {Object}        res          Response Object For API Request.
+   * @returns {Promise<*>}    JSONResponse with success code 200 if deleted, or relevant error code with message.
+   */
+  deleteProductReview: async (req, res) => {
+    try {
+      sails.log.info('====================== DELETE : PRODUCT REVIEW REQUEST ==============================');
+      sails.log.info('REQ BODY :', req.body);
+
+      const request = {
+        userId: req.body.userId,
+        reviewId: req.body.reviewId,
+      };
+
+      // Creating Valid Schema for Request
+      const schema = Joi.object().keys({
+        userId: Joi.number().integer().required(),
+        reviewId: Joi.number().integer().required(),
+      });
+
+      // Validate Request from Valid Schema
+      const validateResult = schema.validate(request);
+      if (validateResult.error) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
+          message: validateResult.error.message,
+        });
+      }
+
+      // Check if the review exists
+      const reviewExists = await prisma.review.findUnique({
+        where: { id: request.reviewId, userId: request.userId },
+      });
+
+      if (!reviewExists) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.NOT_FOUND, {
+          message: 'Review not found.',
+        });
+      }
+
+      const softDeletedReview = await prisma.review.update({
+        where: { id: request.reviewId },
+        data: {
+          deletedAt: new Date(), // Soft delete by setting the current date
+        },
+      });
+
+      sails.log.info('Review deleted successfully.' ,softDeletedReview);
+
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
+        message: 'Review deleted successfully.',
+      });
+    } catch (exception) {
+      sails.log.error(exception);
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
+        message: 'An error occurred while deleting the review.',
+      });
+    }
+  },
+
+  /**
+   * Get All Reviews for a Product
+   * API Endpoint :   /product/review/all
+   * API Method   :   GET
+   *
+   * @param   {Object}        req          Request Object From API Request.
+   * @param   {Object}        res          Response Object For API Request.
+   * @returns {Promise<*>}    JSONResponse with success code 200 and all reviews or relevant error code with message.
+   */
+  getAllProductReviews: async (req, res) => {
+    try {
+      sails.log.info('====================== FETCH : ALL PRODUCT REVIEWS REQUEST ==============================');
+      sails.log.info('REQ QUERY :', req.query);
+
+      const request = {
+        productId: req.query.productId,
+      };
+
+      // Creating Valid Schema for Request
+      const schema = Joi.object().keys({
+        productId: Joi.number().integer().required(),
+      });
+
+      // Validate Request from Valid Schema
+      const validateResult = schema.validate(request);
+      if (validateResult.error) {
+        return ResponseService.jsonResponse(res, ConstantService.responseCode.BAD_REQUEST, {
+          message: validateResult.error.message,
+        });
+      }
+
+      // Fetch all reviews for the product
+      const reviews = await prisma.review.findMany({
+        where: { productId: Number(request.productId) },
+      });
+
+      sails.log.info('Product reviews fetched successfully.', reviews);
+
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.SUCCESS, {
+        message: 'Product reviews fetched successfully.',
+        data: reviews,
+      });
+    } catch (exception) {
+      sails.log.error(exception);
+      return ResponseService.jsonResponse(res, ConstantService.responseCode.INTERNAL_SERVER_ERROR, {
+        message: 'An error occurred while fetching the reviews.',
+      });
+    }
   }
+
+
+
 
 
 };
