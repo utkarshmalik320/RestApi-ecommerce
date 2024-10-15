@@ -24,6 +24,7 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
   deletedAt   DateTime?
+  Review      Review[]
 
   @@map("users")
 }
@@ -73,8 +74,25 @@ model Product {
   createdAt   DateTime  @default(now()) // Timestamp when the product was created
   updatedAt   DateTime  @updatedAt // Timestamp when the product was last updated
   deletedAt   DateTime?
+  reviews     Review[] // One-to-many relationship with reviews
 
   @@map("products") // Optional: Customize table name
+}
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  rating    Int // Rating for the product (e.g., 1 to 5 stars)
+  comment   String? // Optional review comment
+  images    String[] // Array of image URLs stored in the review
+  product   Product   @relation(fields: [productId], references: [id]) // Relationship to Product
+  productId Int
+  user      User      @relation(fields: [userId], references: [id]) // Relationship to User
+  userId    Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("review")
 }
 
 model Seller {

@@ -51,7 +51,7 @@ module.exports.datastores = {
      ***************************************************************************/
 
     adapter: 'sails-postgresql',
-    url: process.env.DATABASE_URL,
+    url: 'postgres://postgres:postgres@localhost:5432/fseven',
   },
 
 
